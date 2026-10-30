@@ -1,9 +1,9 @@
 ﻿---
 name: audit-report-checker
-description: 审计报告、财务报表及附注的勾稽、加总、文本和格式复核。使用运行技能的当前agent，支持128K分批与1M，保留来源、计算和终审。
+description: 用于财务报表、审计报告、附注及Excel/CSV/Word/PDF明细数据的一致性核对、跨期衔接、勾稽、加总、文本和格式复核。
 metadata:
   author: quanfanpro-code
-  version: "2.1.0"
+  version: "2.2.0"
 license: AGPL-3.0-only
 ---
 
@@ -13,7 +13,9 @@ license: AGPL-3.0-only
 
 ## 1. 启动
 
-复用本次对话已答信息，集中询问尚缺项目：
+先完整读取[统一数据核对规则](references/数据核对规则.md)。本技能是原financial-data-check和audit-data-assistant合并后的唯一核对入口；只有明细或台账时按实际关系检查，不虚构四表。
+
+复用已确认的目标、范围与方案，能从资料查清的事实自行核实。常规批次、发现差异、列映射和输出命名不重复暂停；仅关键口径有歧义、范围或授权变化，以及宿主要求确认的不可逆操作才提问。以下项目尚未明确且无法查证时集中询问：
 - 当前驱动模型的上下文是128K、1M还是不清楚？不清楚说明按128K保守安排。
 - 文件范围、主体（合并/母公司/单体/仅附注）、期间、适用会计制度与版本。
 - 深度：quick快速（结构与主要平衡）、standard标准（表内、表注、主要跨表及文本格式）、deep深度（标准加全部适用披露和用户规则）。可选类别：勾稽、横加竖加、表注、文本、格式。
@@ -26,7 +28,7 @@ license: AGPL-3.0-only
 
 以下是Git Bash示例，实际资料和工作目录由agent替换：
 ```bash
-技能='/c/BaiduSyncdisk/workbuddy skills/audit-report-checker'
+技能='/d/BaiduSyncdisk/workbuddy skills/audit-report-checker'
 解释器='/c/Users/27651/AppData/Local/Programs/Python/Python314/python.exe'
 资料='C:/审计项目/审计报告.docx'
 工作='C:/审计项目/复核输出'
@@ -62,6 +64,8 @@ manifest由当前agent读完整原表后写，明确源文件、表ID、行列�
 structure声明全部实际报表、附注及适用范围；最后cross_relations检查同主体同期间的四表、表注、现金构成、权益成分及比较期。表自己平衡不能代替真正跨表核对。所有已选范围逐项判适用，不用41科目名称替代实际全部项目。
 
 ## 4. 交付
+
+逐项保留双方实际来源、原值、单位、换算、公式、差额与结论；一致项也保留核对记录。聊天重点说明范围、统计和差异，完整明细进入交付文件；只在聊天列差异不等于缩减实际检查。真实名称保留原文，不自行脱敏。
 
 状态：通过、确认错误、待核实、未执行、不适用、已排除误报。仅实际终审通过计通过；误报处置保留原计算和依据。不适用另计。统计是对象/片段数，不是独立错误数，同源差异说明关联。
 ```bash
