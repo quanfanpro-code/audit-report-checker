@@ -1,10 +1,10 @@
-﻿"""本地复核的状态、证据及可恢复写入约定。"""
+"""本地复核的状态、证据及可恢复写入约定。"""
 import hashlib
 import json
 import os
 import shutil
 import uuid
-from datetime import datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 from pathlib import Path
 
@@ -22,6 +22,8 @@ def stable_id(value):
 def _decimal(value):
     if isinstance(value, Decimal) and value.is_finite():
         return format(value, "f")
+    if isinstance(value, (datetime, date, time)):
+        return value.isoformat()
     raise TypeError("不支持的JSON值：" + type(value).__name__)
 
 def backup_existing(path):
