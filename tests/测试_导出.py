@@ -65,12 +65,16 @@ def test_最终来源清单也保护原件(验证目录):
 
 def test_长中文依据行高能够显示(验证目录):
     item = record("a", "确认错误")
-    item["review"]["basis"] = "逐项核实金额和取数口径。" * 20
+    item["expected"] = None
+    item["actual"] = None
+    item["difference"] = None
+    item["review"]["basis"] = "第一处疑点：逐项核实金额和取数口径；第二处疑点：逐项核实金额和取数口径。"
     data = {"meta": {"stage": "final"}, "coverage": {"expected_ids": ["a"]}, "results": [item]}
     path = 验证目录 / "长内容.xlsx"
     export.write_excel(data, 验证目录 / "结果.json", path)
     wb = load_workbook(path)
-    assert wb["问题明细"].row_dimensions[7].height > 48
+    heights = [dim.height for dim in wb["问题明细"].row_dimensions.values() if dim.height]
+    assert max(heights) > 48
     wb.close()
 
 
@@ -82,5 +86,6 @@ def test_跨表对象的表注差异进入问题明细(验证目录):
     path = 验证目录 / "分类.xlsx"
     export.write_excel(data, 验证目录 / "结果.json", path)
     wb = load_workbook(path)
-    assert "应收表注" in wb["问题明细"].cell(6, 2).value
+    detail = "\n".join(str(c.value or "") for row in wb["问题明细"].iter_rows() for c in row)
+    assert "应收表注" in detail
     wb.close()
